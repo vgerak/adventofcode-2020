@@ -1,16 +1,25 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::error::Error;
+// use std::error::Error;
+use std::io;
+use std::num;
 use std::fs::read_to_string;
 
-fn main() -> Result<(), Box<dyn Error>> {
+#[derive(Debug)]
+enum MyError {
+    Io(io::Error),
+    Parse(num::ParseIntError),
+}
+
+fn main() -> Result<(), MyError> {
+// fn main() -> Result<(), Box<dyn Error>> {
     let mut numbers = HashSet::new();
     let mut sums = HashMap::new();
     let mut found = 0;
 
-    let input_buffer = read_to_string("files/input.txt")?;
+    let input_buffer = read_to_string("files/input.txt").map_err(MyError::Io)?;
     for line in input_buffer.as_str().lines() {
-        let number = line.parse::<i32>()?;
+        let number = line.parse::<i32>().map_err(MyError::Parse)?;
         let diff = 2020 - number;
 
         if numbers.contains(&diff) {
